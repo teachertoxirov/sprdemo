@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDUNEST — IELTS Reading Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,400;1,500&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#e63946;--red-hover:#c62d39;--red-dim:#fce8ea;--red-light:#fff5f5;--red-glow:rgba(230,57,70,.12);--green:#22a55b;--green-dim:#e6f7ee;--orange:#f59e0b;--orange-dim:#fef3c7;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-500:#6b7280;--gray-600:#4b5563;--gray-700:#374151;--gray-800:#1f2937;--gray-900:#111827;--shadow:0 4px 24px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);--fh:'Playfair Display',serif;--fb:'DM Sans',sans-serif;--fm:'JetBrains Mono',monospace}
+body{font-family:var(--fb);background:#fff;color:var(--gray-800);min-height:100vh}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--red)}
+
+/* WELCOME */
+#welcome-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#fff 0%,#fef2f2 40%,#fff 70%,#fef8f8 100%);position:relative;overflow:hidden}
+#welcome-screen::before{content:'';position:absolute;top:-120px;right:-120px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(230,57,70,.06) 0%,transparent 70%);pointer-events:none}
+.wcard{background:#fff;border:1px solid var(--gray-200);border-radius:20px;box-shadow:0 8px 48px rgba(230,57,70,.07),0 2px 8px rgba(0,0,0,.04);padding:52px 48px 44px;width:100%;max-width:430px;text-align:center;position:relative;z-index:1}
+.logo-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:8px}
+.logo-row img{height:42px;width:auto;border-radius:10px}
+.brand{font-family:var(--fh);font-size:28px;font-weight:800;color:var(--gray-900);letter-spacing:-.5px}
+.brand-sub{font-size:10.5px;letter-spacing:3.5px;text-transform:uppercase;color:var(--gray-400);font-weight:500;margin-bottom:6px}
+.wcard-divider{width:40px;height:2px;background:var(--red);margin:0 auto 24px;border-radius:1px}
+.wcard h2{font-family:var(--fh);font-size:19px;font-weight:700;color:var(--gray-800);margin-bottom:6px}
+.wcard .wcard-desc{font-size:13.5px;color:var(--gray-500);margin-bottom:24px;line-height:1.55}
+.wcard input{width:100%;border:2px solid var(--gray-200);border-radius:10px;padding:13px 16px;font-size:15px;font-family:var(--fb);color:var(--gray-800);outline:none;transition:border-color .15s,box-shadow .15s}
+.wcard input:focus{border-color:var(--red);box-shadow:0 0 0 4px var(--red-glow)}
+.err-msg{color:var(--red);font-size:12.5px;margin:8px 0 12px;display:none;text-align:left}
+.btn-start{width:100%;background:var(--red);color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:600;font-family:var(--fb);cursor:pointer;transition:background .15s,box-shadow .15s;margin-top:8px}
+.btn-start:hover{background:var(--red-hover);box-shadow:0 4px 16px rgba(230,57,70,.25)}
+
+/* PRACTICE */
+#practice-screen{display:none;flex-direction:column;height:100vh;overflow:hidden;background:#fff}
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:52px;background:#fff;border-bottom:1.5px solid var(--gray-200);flex-shrink:0;z-index:10}
+.tb-left{display:flex;align-items:center;gap:10px}
+.tb-logo{height:26px;width:auto;border-radius:5px}
+.tb-brand{font-family:var(--fh);font-weight:700;font-size:16px;color:var(--gray-900)}
+.rp-pill{background:var(--red-dim);color:var(--red);border-radius:20px;padding:3px 11px;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.tb-right{display:flex;align-items:center;gap:10px}
+.name-badge{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:20px;padding:4px 13px;font-size:12.5px;font-weight:500;color:var(--gray-600);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.viol-badge{border-radius:20px;padding:4px 10px;font-size:11.5px;font-weight:600;font-family:var(--fm);transition:all .2s}
+.viol-badge.zero{background:var(--gray-100);border:1px solid var(--gray-200);color:var(--gray-400)}
+.viol-badge.nonzero{background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange)}
+.timer-box{border:2px solid var(--red);background:var(--red-dim);border-radius:8px;padding:4px 13px;font-family:var(--fm);font-size:16px;font-weight:600;color:var(--red);min-width:78px;text-align:center}
+.timer-box.paused{animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* HIGHLIGHT */
+#highlight-btn,#remove-highlight-btn{position:fixed;z-index:99999;display:none;padding:5px 14px;font-size:13px;font-weight:600;font-family:var(--fb);border:1.5px solid var(--gray-300);border-radius:8px;cursor:pointer;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,.18);color:var(--gray-700);pointer-events:auto}
+#highlight-btn:hover{background:#fef9c3;border-color:#ca8a04;color:#78350f}
+#remove-highlight-btn{border-color:var(--red);color:var(--red)}
+#remove-highlight-btn:hover{background:var(--red-dim)}
+.highlighted{background:#fff176;color:var(--gray-800)!important;cursor:pointer;border-radius:2px;box-shadow:inset 0 -1px 0 rgba(0,0,0,.15);display:inline;padding:0;margin:0;line-height:inherit;white-space:pre-wrap;font-size:inherit}
+.highlighted *{color:inherit!important}
+
+/* SPLIT */
+.split{display:flex;flex:1;overflow:hidden}
+.passage-pane{width:50%;overflow-y:auto;padding:28px 30px 64px;border-right:1.5px solid var(--gray-200);background:#fff}
+.q-pane{width:50%;overflow-y:auto;padding:24px 24px 70px;background:var(--gray-50)}
+
+/* PASSAGE */
+.pass-tag{display:inline-block;background:var(--red);color:#fff;border-radius:20px;padding:5px 16px;font-size:10.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:18px}
+.pass-title{font-family:var(--fh);font-size:27px;font-weight:800;line-height:1.25;color:var(--gray-900);margin-bottom:6px}
+.pass-subtitle{font-family:var(--fh);font-style:italic;font-size:15px;color:var(--gray-500);margin-bottom:22px}
+.pass-body{font-size:15px;line-height:1.88;text-align:justify;color:var(--gray-800)}
+.pass-body p{margin-bottom:16px}
+.para-label{font-weight:700;color:var(--red);margin-right:5px}
+
+/* Q SECTION */
+.q-sec{margin-bottom:28px}
+.q-sec-title{background:var(--red-dim);border-left:3px solid var(--red);padding:9px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--red);border-radius:0 8px 8px 0;margin-bottom:10px}
+.q-sec-note{background:#fff;border:1.5px solid var(--gray-200);border-radius:8px;padding:11px 14px;font-size:13px;color:var(--gray-600);margin-bottom:16px;line-height:1.6}
+
+/* Q CARD */
+.q-card{background:#fff;border:2px solid var(--gray-200);border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:border-color .2s,background .2s}
+.q-card.answered{border-color:var(--green);background:var(--green-dim)}
+.q-card.answered .q-num{background:var(--green);color:#fff}
+.q-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.q-num{min-width:28px;height:28px;background:var(--red-dim);color:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:12px;font-weight:600;flex-shrink:0;transition:background .2s,color .2s}
+.q-text{font-size:14px;line-height:1.55;padding-top:3px;color:var(--gray-800)}
+
+/* TF/NG */
+.tfng-group{display:flex;gap:7px;flex-wrap:wrap}
+.tfng-btn{border:1.5px solid var(--gray-300);background:#fff;border-radius:7px;padding:7px 15px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--gray-600);font-family:var(--fb)}
+.tfng-btn:hover{border-color:var(--red);color:var(--red);background:var(--red-dim)}
+.tfng-btn.selected{background:var(--red);border-color:var(--red);color:#fff}
+
+/* MCQ */
+.mc-options-group{display:flex;flex-direction:column;gap:6px}
+.mc-option{display:block;padding:10px 13px;border:2px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .15s;background:#fff;user-select:text;line-height:1.6}
+.mc-option:hover{border-color:var(--red)}
+.mc-option.selected{background:var(--red-dim);border-color:var(--red)}
+.mc-option.selected .mc-letter{background:var(--red);color:#fff}
+.mc-letter{width:26px;height:26px;border-radius:50%;background:var(--gray-200);display:inline-flex;vertical-align:middle;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gray-600);transition:all .15s;font-family:var(--fm);margin-right:8px}
+.mc-option-text{font-size:13.5px;color:var(--gray-800);line-height:1.5;display:inline;vertical-align:middle}
+
+/* FILL */
+.fill-input{border:2px solid var(--red);border-radius:8px;padding:9px 13px;font-size:14px;font-family:var(--fb);color:var(--gray-800);max-width:340px;width:100%;outline:none}
+.fill-input:focus{box-shadow:0 0 0 4px var(--red-glow)}
+
+/* DROPDOWNS */
+.heading-select,.ending-select,.match-select{border:2px solid var(--red);border-radius:8px;padding:9px 11px;font-size:14px;font-family:var(--fb);color:var(--gray-800);max-width:340px;width:100%;outline:none;background:#fff;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23e63946' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.heading-select:focus,.ending-select:focus,.match-select:focus{box-shadow:0 0 0 4px var(--red-glow)}
+.ref-box{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:10px;padding:14px 16px;margin-bottom:14px;font-size:13px}
+.ref-box-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--red);margin-bottom:10px}
+.ref-box ol{padding-left:20px;line-height:1.9;color:var(--gray-700);font-size:13px}
+.endings-box{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.endings-box-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--gray-600);margin-bottom:10px}
+.endings-list{display:flex;flex-direction:column;gap:6px}
+.ending-item{font-size:13px;line-height:1.5;color:var(--gray-700)}
+
+/* SUMMARY INLINE */
+.summary-block{background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:10px;padding:18px 20px;font-size:14.5px;line-height:2.2;color:var(--gray-800)}
+.inline-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;background:var(--red);color:#fff;border-radius:50%;font-size:10px;font-weight:700;font-family:var(--fm);margin:0 3px;vertical-align:middle}
+.inline-input{border:none;border-bottom:2px solid var(--red);background:transparent;padding:2px 6px;font-size:14px;font-family:var(--fb);color:var(--gray-800);width:120px;outline:none}
+.inline-input:focus{border-bottom-color:var(--red-hover)}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13.5px}
+.data-table th{background:var(--red);color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:12px}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:nth-child(even) td{background:var(--gray-50)}
+.table-input{border:none;border-bottom:2px solid var(--red);background:transparent;font-family:var(--fb);font-size:13px;padding:2px 4px;outline:none;color:var(--gray-800);width:130px}
+
+/* FLOWCHART */
+.flow-box{background:#fff;border:2px solid var(--gray-200);border-radius:10px;padding:14px 16px;margin-bottom:4px;font-size:14px;line-height:1.8}
+.flow-arrow{text-align:center;font-size:18px;color:var(--red);font-weight:700;margin:2px 0}
+
+/* DRAG AND DROP */
+.drag-pool{display:flex;flex-wrap:wrap;gap:8px;padding:12px;background:var(--gray-100);border:1px dashed var(--gray-300);border-radius:8px;margin-bottom:14px;min-height:44px}
+.drag-chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2px solid var(--gray-300);border-radius:8px;padding:6px 14px;font-size:13px;font-weight:500;color:var(--gray-700);cursor:grab;user-select:none;transition:all .15s;font-family:var(--fb)}
+.drag-chip:hover{border-color:var(--red);color:var(--red)}
+.drag-chip:active{cursor:grabbing;opacity:.7}
+.drag-chip.used{opacity:.35;pointer-events:none;border-style:dashed}
+.chip-letter{font-family:var(--fm);font-weight:700;color:var(--red);min-width:16px}
+.drop-zone{display:inline-flex;align-items:center;justify-content:center;min-width:80px;min-height:34px;border:2px dashed var(--gray-300);border-radius:7px;padding:4px 12px;font-size:13px;color:var(--gray-400);background:#fff;transition:all .15s;cursor:default;vertical-align:middle;margin:2px 4px}
+.drop-zone.drag-over{border-color:var(--red);background:var(--red-light)}
+.drop-zone.filled{border-style:solid;border-color:var(--red);background:var(--red-dim);color:var(--gray-800);font-weight:600;cursor:pointer}
+
+/* SUBMIT */
+.submit-wrap{padding:20px 0 0;text-align:center}
+.btn-submit{background:var(--red);color:#fff;border:none;border-radius:10px;padding:14px 40px;font-size:15px;font-weight:700;font-family:var(--fb);cursor:pointer;transition:background .15s,box-shadow .15s}
+.btn-submit:hover{background:var(--red-hover);box-shadow:0 4px 16px rgba(230,57,70,.25)}
+
+/* OVERLAYS */
+.overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.ov-card{background:#fff;border-radius:20px;padding:40px 44px;max-width:440px;width:92%;text-align:center;box-shadow:var(--shadow-lg)}
+.ov-icon{font-size:44px;margin-bottom:14px}
+.ov-title{font-family:var(--fh);font-size:23px;font-weight:700;margin-bottom:10px;color:var(--gray-900)}
+.ov-msg{font-size:14px;color:var(--gray-500);line-height:1.65;margin-bottom:16px}
+.ov-viol{display:inline-block;background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange);border-radius:20px;padding:5px 15px;font-size:12px;font-weight:600;margin-bottom:20px}
+.btn-cont{background:var(--red);color:#fff;border:none;border-radius:10px;padding:13px 34px;font-size:15px;font-weight:600;font-family:var(--fb);cursor:pointer}
+.btn-cont:hover{background:var(--red-hover)}
+.modal-ov{position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+.modal-ov.show{display:flex}
+.modal-card{background:#fff;border-radius:20px;padding:38px 42px;max-width:420px;width:92%;text-align:center;box-shadow:var(--shadow-lg)}
+.modal-icon{font-size:36px;margin-bottom:12px}
+.modal-title{font-family:var(--fh);font-size:21px;font-weight:700;margin-bottom:8px;color:var(--gray-900)}
+.modal-msg{font-size:13.5px;color:var(--gray-500);margin-bottom:14px;line-height:1.6}
+.modal-viol{background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange);border-radius:20px;padding:5px 14px;font-size:12.5px;font-weight:600;margin-bottom:20px;display:inline-block}
+.modal-btns{display:flex;gap:12px;justify-content:center}
+.btn-cancel{border:2px solid var(--gray-300);background:#fff;color:var(--gray-700);border-radius:10px;padding:11px 26px;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer}
+.btn-yes{background:var(--red);color:#fff;border:none;border-radius:10px;padding:11px 26px;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer}
+.btn-yes:hover{background:var(--red-hover)}
+
+/* RESULT */
+#result-screen{display:none;min-height:100vh;background:linear-gradient(160deg,#fff 0%,#fef2f2 40%,#fff 70%,#fef8f8 100%);padding:40px 20px;overflow-y:auto}
+.res-card{background:#fff;border-radius:20px;box-shadow:var(--shadow-lg);max-width:700px;width:100%;overflow:hidden;margin:0 auto}
+.res-header{background:var(--red);padding:26px 32px}
+.res-brand{font-family:var(--fh);font-size:22px;font-weight:800;color:#fff}
+.res-sub{font-size:11.5px;color:rgba(255,255,255,.8);text-transform:uppercase;letter-spacing:1.8px}
+.res-body{padding:28px 32px}
+.success-msg{background:var(--green-dim);border:1.5px solid var(--green);border-radius:10px;padding:11px 18px;font-size:13.5px;color:var(--green);font-weight:600;text-align:center;margin-bottom:20px;display:none}
+.res-meta{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:24px}
+.meta-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--gray-500)}
+.meta-item strong{color:var(--gray-800)}
+.ans-wrap{border:2px solid var(--gray-200);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.ans-hdr{background:var(--gray-100);padding:12px 18px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.8px;color:var(--gray-500)}
+.ans-row{display:flex;align-items:center;padding:10px 18px;border-bottom:1px solid var(--gray-100)}
+.ans-row:last-child{border-bottom:none}
+.ans-row:nth-child(even){background:var(--gray-50)}
+.ans-q{font-family:var(--fm);font-weight:600;color:var(--red);font-size:13px;min-width:56px}
+.ans-v{font-family:var(--fm);font-size:13px;color:var(--gray-800)}
+.ans-v.none{font-style:italic;color:var(--gray-400);font-family:var(--fb)}
+.res-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn-copy{border:2px solid var(--gray-300);background:#fff;color:var(--gray-800);border-radius:10px;padding:11px 22px;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer}
+.btn-pdf{background:var(--red);color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer}
+.btn-pdf:hover{background:var(--red-hover)}
+.btn-contact{background:#229ED9;color:#fff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:600;font-family:var(--fb);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+.btn-contact:hover{background:#1a8ac8}
+
+@media(max-width:768px){.split{flex-direction:column}.passage-pane,.q-pane{width:100%}.passage-pane{border-right:none;border-bottom:1.5px solid var(--gray-200);max-height:45vh}.tb-brand{display:none}.name-badge{display:none}.wcard{padding:36px 28px 32px}.match-select{width:100%}}
+</style>
+</head>
+<body>
+
+<div id="welcome-screen"><div class="wcard">
+  <div class="logo-row"><img src="https://i.ibb.co/WWYjsWTh/image.png" alt="EDUNEST" onerror="this.style.display='none'"><span class="brand">EDUNEST</span></div>
+  <div class="brand-sub">Reading Practice</div><div class="wcard-divider"></div>
+  <h2 id="welcome-title"><!-- PASSAGE TITLE --></h2>
+  <p class="wcard-desc" id="welcome-desc"><!-- e.g. "Enter your name. Questions 14–26." --></p>
+  <div><input type="text" id="name-inp" placeholder="Enter your full name..." autocomplete="off"></div>
+  <div class="err-msg" id="name-err">Please enter your name to continue.</div>
+  <button class="btn-start" id="start-btn">Start Practice →</button>
+</div></div>
+
+<div class="overlay" id="viol-overlay"><div class="ov-card">
+  <div class="ov-icon" id="ov-icon">⚠️</div><div class="ov-title" id="ov-title">Practice Paused</div>
+  <div class="ov-msg" id="ov-msg">You left the practice window. Timer paused.</div>
+  <div class="ov-viol" id="ov-viol">Tab switches: 0</div>
+  <button class="btn-cont" id="continue-btn">Continue</button>
+</div></div>
+
+<div class="modal-ov" id="submit-modal"><div class="modal-card">
+  <div class="modal-icon">📋</div><div class="modal-title">Submit Your Answers?</div>
+  <div class="modal-msg">Your stopwatch will stop and answers will be recorded.</div>
+  <div class="modal-viol" id="modal-viol">Tab switches: 0</div>
+  <div class="modal-btns"><button class="btn-cancel" id="modal-cancel">Cancel</button><button class="btn-yes" id="modal-yes">Yes, Submit</button></div>
+</div></div>
+
+<button id="highlight-btn">🖊 Highlight</button>
+<button id="remove-highlight-btn">✕ Remove</button>
+
+<div id="practice-screen">
+  <div class="top-bar">
+    <div class="tb-left"><img src="https://i.ibb.co/WWYjsWTh/image.png" class="tb-logo" alt="" onerror="this.style.display='none'"><span class="tb-brand">EDUNEST</span><span class="rp-pill">Reading</span></div>
+    <div class="tb-right"><span class="name-badge" id="top-name">Student</span><span class="viol-badge zero" id="viol-badge">⚠ 0</span><div class="timer-box" id="timer">00:00</div></div>
+  </div>
+  <div class="split">
+    <div class="passage-pane" id="passage-pane">
+      <div class="pass-tag" id="pass-tag">Reading Passage 3 · Questions 27–40</div>
+      <div class="pass-title" id="pass-title">The Discovery of Slowness</div>
+      <div class="pass-body">
+        <p><span class="para-label">A</span>The English explorer and writer John Franklin (1786–1847) joined the Navy at the age of 18. The boats he sailed on were used in Arctic expeditions and in attempts to solve the question of the Northwest Passage, a water route through the ice which would, if it existed, link the Pacific Ocean on America's west coast with the Atlantic on its east. The first expedition Franklin led to the Arctic was an official overland mission lasting from 1819 to 1822, in which he and his team covered 6,890 kilometres on foot. The expedition was hailed as a triumph of survival because they managed to chart hundreds of kilometres of previously unknown coastline, but food ran out on their journey back to civilisation. They were eventually forced to eat their belts and then their boots, which they boiled to make leather soup.</p>
+        <p><span class="para-label">B</span>There followed a career as a travel writer and public speaker, the man who ate his boots becoming Franklin's public tag-line. Then in 1845, Franklin set off back to the Arctic with two ships, the <em>Erebus</em> and the <em>Terror</em>, and 129 men. Nothing was heard of them for 14 years, although more than 30 expeditions were launched in search of them. Eventually it was discovered that Franklin and all his team had perished after their ships were trapped in the ice.</p>
+        <p><span class="para-label">C</span>In his personal correspondence and published memoirs, Franklin comes across as a man dedicated to the external duties of war and exploration, who kept introspection and self-analysis to a minimum. This makes him an amenable subject for a novelist, and Sten Nadolny has taken full advantage of this in his book. Most important, Nadolny has provided John Franklin with a defining trait for which there is no historical evidence: <em>Langsamkeit</em>, or slowness.</p>
+        <p><span class="para-label">D</span>Slowness influences not only Franklin's behaviour, but also his vision, his thought and his speech. The opening scene of <em>The Discovery of Slowness</em> depicts Franklin as a young boy, failing to catch a ball because his reaction time is too slow. Despite the bullying of his peers, Franklin resolves not to fall into step with their way of doing things. For Nadolny, Franklin's fascination with the Arctic stems from his desire to find an environment suited to his peculiar slowness. He describes Franklin as a boy dreaming of the time without hours and days which exists in the far north, a place where nobody would find him too slow.</p>
+        <p><span class="para-label">E</span>Ice is a slow mover. The compressed blue ice inside an Alpine crevasse will have fallen as snow several decades earlier. Polar pack ice takes at least two years to form. The film of crystals which first appears on the surface of the sea thickens into a silky plant layer called nilas; this in turn consolidates into young ice, which then deepens during several seasons to become pack-ice. This process demands a corresponding patience from those who venture onto it. The explorers who thrive at high latitudes and high altitudes have not usually been men of great speed. They have instead tended to demonstrate unusual self-possession, a considerable capacity for boredom, and a talent for the uncomplaining endurance of suffering.</p>
+        <p><span class="para-label">F</span>These were all qualities which the historical Franklin possessed in abundance, and so Nadolny's exaggeration of them is not unreasonable. Even as an adult, Franklin's slowness of thought means that he is unable to speak fluently, so he learns by heart entire fleets of words and batteries of responses, and speaks a languid, ice-blue language. In the Navy, his method of thinking first and acting later initially provokes mockery from his fellow sailors. But Franklin persists in doing things his way, and gradually earns the respect of those around him. To a commodore who tells him to speed up his report of an engagement, he replies: 'When I tell something, sir, I use my own rhythm.' A lieutenant says approvingly of him: 'Because Franklin is so slow, he never loses time.'</p>
+        <p><span class="para-label">G</span>Nadolny also brings his central metaphor of slowness to bear on the novel's structure. The chapters describing Franklin's early years are a medley of separate fragments, rhetorical questions, associative jumps and exclamation marks. Later, in recounting Franklin's first Arctic expedition, Nadolny brilliantly sets the narrative pace to the rhythms of the frozen landscape, and to the slowness which is bred by hunger.</p>
+        <p><span class="para-label">H</span>Since it was first published in Germany in 1983, <em>The Discovery of Slowness</em> has sold more than a million copies and been translated into 15 languages. It has been adopted as a manual and manifesto by European pressure groups and institutions representing causes as diverse as sustainable development, management science and modern policy, even becoming involved in the debate about speed limits on German roads. The various groups that have taken the novel up have one thing in common: a dislike of the high-speed culture of postmodernity. Nadolny's Franklin appeals to them because he is immune to the compulsion to be constantly occupied, and to the idea that someone was better if he could do the same thing fast.</p>
+      </div>
+    </div>
+    <div class="q-pane" id="q-pane">
+      <!-- QUESTION SECTIONS -->
+
+      <!-- Q27–31: Paragraph matching -->
+      <div class="q-sec">
+        <div class="q-sec-title">Questions 27–31 · Matching Paragraphs</div>
+        <div class="q-sec-note">Reading Passage 3 has eight paragraphs, <strong>A–H</strong>. Which paragraph contains the following information? Choose the correct letter, <strong>A–H</strong>, in boxes 27–31 on your answer sheet.</div>
+
+        <div class="q-card" id="qc27">
+          <div class="q-card-top"><div class="q-num">27</div><div class="q-text">A summary of Franklin's occupation in the period before his first expedition</div></div>
+          <select class="heading-select" data-q="27">
+            <option value="">— Select —</option>
+            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+            <option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option>
+          </select>
+        </div>
+
+        <div class="q-card" id="qc28">
+          <div class="q-card-top"><div class="q-num">28</div><div class="q-text">A reference to a feature of Franklin's character in Nadolny's novel that has no definite basis in fact</div></div>
+          <select class="heading-select" data-q="28">
+            <option value="">— Select —</option>
+            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+            <option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option>
+          </select>
+        </div>
+
+        <div class="q-card" id="qc29">
+          <div class="q-card-top"><div class="q-num">29</div><div class="q-text">A connection between the central theme of the novel and an environmental process</div></div>
+          <select class="heading-select" data-q="29">
+            <option value="">— Select —</option>
+            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+            <option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option>
+          </select>
+        </div>
+
+        <div class="q-card" id="qc30">
+          <div class="q-card-top"><div class="q-num">30</div><div class="q-text">A reference to the widespread appeal of Nadolny's novel</div></div>
+          <select class="heading-select" data-q="30">
+            <option value="">— Select —</option>
+            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+            <option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option>
+          </select>
+        </div>
+
+        <div class="q-card" id="qc31">
+          <div class="q-card-top"><div class="q-num">31</div><div class="q-text">A summary of events following Franklin's return from his first expedition</div></div>
+          <select class="heading-select" data-q="31">
+            <option value="">— Select —</option>
+            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+            <option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Q32–35: Summary completion with word list -->
+      <div class="q-sec">
+        <div class="q-sec-title">Questions 32–35 · Summary Completion</div>
+        <div class="q-sec-note">Complete the summary using the list of words, <strong>A–L</strong>, below.
+          <div style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px 12px;font-size:12.5px;color:var(--gray-700)">
+            <span><strong>A</strong> a bully</span><span><strong>B</strong> discoveries</span><span><strong>C</strong> educational</span>
+            <span><strong>D</strong> family</span><span><strong>E</strong> an outsider</span><span><strong>F</strong> isolation</span>
+            <span><strong>G</strong> personality</span><span><strong>H</strong> problems</span><span><strong>I</strong> a scholar</span>
+            <span><strong>J</strong> remoteness</span><span><strong>K</strong> sporting</span><span><strong>L</strong> timelessness</span>
+          </div>
+        </div>
+        <div class="q-card">
+          <div class="summary-block">
+            <strong>John Franklin and the Quality of Slowness</strong><br><br>
+            Little is known from Franklin's correspondence and published writings about his
+            <span class="inline-num">32</span>
+            <select class="heading-select" data-q="32" style="width:160px;display:inline-block;margin:0 4px;vertical-align:middle">
+              <option value="">— Select —</option>
+              <option value="A">A – a bully</option><option value="B">B – discoveries</option><option value="C">C – educational</option>
+              <option value="D">D – family</option><option value="E">E – an outsider</option><option value="F">F – isolation</option>
+              <option value="G">G – personality</option><option value="H">H – problems</option><option value="I">I – a scholar</option>
+              <option value="J">J – remoteness</option><option value="K">K – sporting</option><option value="L">L – timelessness</option>
+            </select>.
+            <br><br>
+            The author, Nadolny, suggests that Franklin's whole life can be explained by the quality of slowness. He begins the book by showing how this affects the young Franklin's
+            <span class="inline-num">33</span>
+            <select class="heading-select" data-q="33" style="width:160px;display:inline-block;margin:0 4px;vertical-align:middle">
+              <option value="">— Select —</option>
+              <option value="A">A – a bully</option><option value="B">B – discoveries</option><option value="C">C – educational</option>
+              <option value="D">D – family</option><option value="E">E – an outsider</option><option value="F">F – isolation</option>
+              <option value="G">G – personality</option><option value="H">H – problems</option><option value="I">I – a scholar</option>
+              <option value="J">J – remoteness</option><option value="K">K – sporting</option><option value="L">L – timelessness</option>
+            </select>
+            activities, and makes him become
+            <span class="inline-num">34</span>
+            <select class="heading-select" data-q="34" style="width:160px;display:inline-block;margin:0 4px;vertical-align:middle">
+              <option value="">— Select —</option>
+              <option value="A">A – a bully</option><option value="B">B – discoveries</option><option value="C">C – educational</option>
+              <option value="D">D – family</option><option value="E">E – an outsider</option><option value="F">F – isolation</option>
+              <option value="G">G – personality</option><option value="H">H – problems</option><option value="I">I – a scholar</option>
+              <option value="J">J – remoteness</option><option value="K">K – sporting</option><option value="L">L – timelessness</option>
+            </select>.
+            <br><br>
+            As a child, it is the quality of
+            <span class="inline-num">35</span>
+            <select class="heading-select" data-q="35" style="width:160px;display:inline-block;margin:0 4px;vertical-align:middle">
+              <option value="">— Select —</option>
+              <option value="A">A – a bully</option><option value="B">B – discoveries</option><option value="C">C – educational</option>
+              <option value="D">D – family</option><option value="E">E – an outsider</option><option value="F">F – isolation</option>
+              <option value="G">G – personality</option><option value="H">H – problems</option><option value="I">I – a scholar</option>
+              <option value="J">J – remoteness</option><option value="K">K – sporting</option><option value="L">L – timelessness</option>
+            </select>
+            that attracts Franklin to the Arctic.
+          </div>
+        </div>
+      </div>
+
+      <!-- Q36–40: Multiple choice -->
+      <div class="q-sec">
+        <div class="q-sec-title">Questions 36–40 · Multiple Choice</div>
+        <div class="q-sec-note">Choose the correct answer, <strong>A</strong>, <strong>B</strong>, <strong>C</strong> or <strong>D</strong>.</div>
+
+        <div class="q-card" id="qc36">
+          <div class="q-card-top"><div class="q-num">36</div><div class="q-text">In paragraph E, the writer describes different types of ice in order to illustrate</div></div>
+          <div class="mc-options-group" data-q="36">
+            <div class="mc-option" data-type="single" data-val="A"><span class="mc-letter">A</span><span class="mc-option-text">the extreme conditions that Polar explorers have to face.</span></div>
+            <div class="mc-option" data-type="single" data-val="B"><span class="mc-letter">B</span><span class="mc-option-text">the unusual quality of the beauty of Polar regions.</span></div>
+            <div class="mc-option" data-type="single" data-val="C"><span class="mc-letter">C</span><span class="mc-option-text">the vital importance of preserving the Arctic environment.</span></div>
+            <div class="mc-option" data-type="single" data-val="D"><span class="mc-letter">D</span><span class="mc-option-text">the personal qualities required of an explorer in Arctic conditions.</span></div>
+          </div>
+        </div>
+
+        <div class="q-card" id="qc37">
+          <div class="q-card-top"><div class="q-num">37</div><div class="q-text">What is said about the way Franklin communicates?</div></div>
+          <div class="mc-options-group" data-q="37">
+            <div class="mc-option" data-type="single" data-val="A"><span class="mc-letter">A</span><span class="mc-option-text">He expresses a very limited range of ideas.</span></div>
+            <div class="mc-option" data-type="single" data-val="B"><span class="mc-letter">B</span><span class="mc-option-text">He is only willing to discuss things he is familiar with.</span></div>
+            <div class="mc-option" data-type="single" data-val="C"><span class="mc-letter">C</span><span class="mc-option-text">He uses words and phrases that he has previously memorised.</span></div>
+            <div class="mc-option" data-type="single" data-val="D"><span class="mc-letter">D</span><span class="mc-option-text">He is only fluent when talking about naval matters.</span></div>
+          </div>
+        </div>
+
+        <div class="q-card" id="qc38">
+          <div class="q-card-top"><div class="q-num">38</div><div class="q-text">How does the attitude of the other sailors change towards Franklin?</div></div>
+          <div class="mc-options-group" data-q="38">
+            <div class="mc-option" data-type="single" data-val="A"><span class="mc-letter">A</span><span class="mc-option-text">They no longer notice his slowness.</span></div>
+            <div class="mc-option" data-type="single" data-val="B"><span class="mc-letter">B</span><span class="mc-option-text">They start to copy his approach to work.</span></div>
+            <div class="mc-option" data-type="single" data-val="C"><span class="mc-letter">C</span><span class="mc-option-text">They begin to recognise his efforts to overcome his problems.</span></div>
+            <div class="mc-option" data-type="single" data-val="D"><span class="mc-letter">D</span><span class="mc-option-text">They eventually appreciate his good qualities.</span></div>
+          </div>
+        </div>
+
+        <div class="q-card" id="qc39">
+          <div class="q-card-top"><div class="q-num">39</div><div class="q-text">The chapters of <em>The Discovery of Slowness</em> which describe Franklin's early years contain</div></div>
+          <div class="mc-options-group" data-q="39">
+            <div class="mc-option" data-type="single" data-val="A"><span class="mc-letter">A</span><span class="mc-option-text">text from a wide variety of sources.</span></div>
+            <div class="mc-option" data-type="single" data-val="B"><span class="mc-letter">B</span><span class="mc-option-text">short, disconnected pieces of text.</span></div>
+            <div class="mc-option" data-type="single" data-val="C"><span class="mc-letter">C</span><span class="mc-option-text">descriptions of the Arctic landscape.</span></div>
+            <div class="mc-option" data-type="single" data-val="D"><span class="mc-letter">D</span><span class="mc-option-text">information about other explorers like Franklin.</span></div>
+          </div>
+        </div>
+
+        <div class="q-card" id="qc40">
+          <div class="q-card-top"><div class="q-num">40</div><div class="q-text"><em>The Discovery of Slowness</em> has achieved widespread popularity because</div></div>
+          <div class="mc-options-group" data-q="40">
+            <div class="mc-option" data-type="single" data-val="A"><span class="mc-letter">A</span><span class="mc-option-text">it reflects many people's concern about one aspect of modern life.</span></div>
+            <div class="mc-option" data-type="single" data-val="B"><span class="mc-letter">B</span><span class="mc-option-text">it offers achievable solutions to many of the problems of today.</span></div>
+            <div class="mc-option" data-type="single" data-val="C"><span class="mc-letter">C</span><span class="mc-option-text">it tells the story of someone's triumph over personal problems.</span></div>
+            <div class="mc-option" data-type="single" data-val="D"><span class="mc-letter">D</span><span class="mc-option-text">it shows how life in the past was less pressured than it is now.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-wrap"><button class="btn-submit" id="submit-btn">Submit Answers</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="result-screen"><div class="res-card">
+  <div class="res-header"><div><div class="res-brand">EDUNEST ACADEMY</div><div class="res-sub">Reading Practice — Answer Sheet | Teacher Toxirov</div></div></div>
+  <div class="res-body">
+    <div class="success-msg" id="success-msg">✓ Answer sheets downloaded.</div>
+    <div class="res-meta"><div class="meta-item">👤 <strong id="r-name">—</strong></div><div class="meta-item">📅 <strong id="r-date">—</strong></div><div class="meta-item">⏱ <strong id="r-time">—</strong></div><div class="meta-item" id="r-viol-wrap">⚠ <strong id="r-viol">—</strong></div></div>
+    <div class="ans-wrap"><div class="ans-hdr" id="ans-hdr">Your Answers</div><div id="ans-list"></div></div>
+    <div class="res-actions"><button class="btn-copy" id="copy-btn">📋 Copy Answers</button><button class="btn-pdf" id="pdf-btn">⬇ Download PDF</button><a href="https://t.me/toxirov_teacher" target="_blank" class="btn-contact">✈ Contact Teacher</a></div>
+  </div>
+</div></div>
+
+<script>
+/* ═══ PASSAGE CONFIG — UPDATE FOR EACH NEW PASSAGE ═══ */
+const Q_START=27, Q_END=40, PASS_NUM=3, PASS_TITLE='The Discovery of Slowness';
+const Q_RANGE=Q_START+'–'+Q_END;
+const EXAM_CONFIG={brandName:'EDUNEST',examTitle:'IELTS Reading Practice',teacher:'Teacher Toxirov'};
+
+let studentName='',secs=0,ticker=null,running=false,violations=0,blocked=false,submitted=false,finalDate='';
+const answers={};
+function $(id){return document.getElementById(id)}
+function sanitize(n){return n.replace(/[^a-zA-Z0-9]/g,'_')}
+function fmtTimer(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function fmtTime(s){return Math.floor(s/60)+'m '+(s%60)+'s'}
+function getRows(){const r=[];for(let i=Q_START;i<=Q_END;i++)r.push({q:i,a:answers[i]||null});return r}
+
+document.addEventListener('DOMContentLoaded',()=>{$('welcome-title').textContent=PASS_TITLE||'Reading Practice';$('welcome-desc').textContent=`Enter your name to begin. Questions ${Q_RANGE}.`;$('pass-tag').textContent=`Reading Passage ${PASS_NUM} · Questions ${Q_RANGE}`;if(PASS_TITLE)$('pass-title').textContent=PASS_TITLE;$('ans-hdr').textContent=`Your Answers · Questions ${Q_RANGE}`});
+
+$('name-inp').addEventListener('keydown',e=>{if(e.key==='Enter')startPractice()});
+$('start-btn').addEventListener('click',startPractice);
+function startPractice(){const inp=$('name-inp');if(!inp.value.trim()){$('name-err').style.display='block';return}$('name-err').style.display='none';studentName=inp.value.trim();$('top-name').textContent=studentName;$('welcome-screen').style.display='none';$('practice-screen').style.display='flex';requestFS()}
+
+function requestFS(){const el=document.documentElement;const fn=el.requestFullscreen||el.webkitRequestFullscreen;if(fn)fn.call(el).catch(()=>startTimer());else startTimer()}
+function isFS(){return !!(document.fullscreenElement||document.webkitFullscreenElement)}
+let firstFS=true;
+function onFSChange(){if(submitted)return;if(!isFS()){if(!blocked){violations++;updateVB();showOverlay('fullscreen')}}else{if(firstFS){firstFS=false;startTimer()}}}
+document.addEventListener('fullscreenchange',onFSChange);document.addEventListener('webkitfullscreenchange',onFSChange);
+document.addEventListener('visibilitychange',()=>{if(submitted||!document.hidden||blocked)return;violations++;updateVB();showOverlay('tab')});
+window.addEventListener('blur',()=>{if(submitted||blocked)return;violations++;updateVB();showOverlay('blur')});
+
+function showOverlay(type){if(blocked)return;blocked=true;pauseTimer();$('ov-icon').textContent=type==='fullscreen'?'🖥️':'⚠️';$('ov-title').textContent=type==='fullscreen'?'Full Screen Required':'Practice Paused';$('ov-msg').textContent=type==='fullscreen'?'Click Continue to re-enter full screen.':'You left the practice window. Timer paused.';$('ov-viol').textContent='Tab switches: '+violations;$('viol-overlay').classList.add('show')}
+$('continue-btn').addEventListener('click',()=>{$('viol-overlay').classList.remove('show');blocked=false;if(!isFS()){requestFS();setTimeout(()=>{if(!running)startTimer()},700)}else startTimer()});
+
+function startTimer(){if(running)return;running=true;$('timer').classList.remove('paused');ticker=setInterval(()=>{secs++;$('timer').textContent=fmtTimer(secs)},1000)}
+function pauseTimer(){if(!running)return;running=false;clearInterval(ticker);$('timer').classList.add('paused')}
+function stopTimer(){running=false;clearInterval(ticker);$('timer').classList.remove('paused')}
+function updateVB(){const b=$('viol-badge');b.textContent='⚠ '+violations;b.className='viol-badge '+(violations>0?'nonzero':'zero')}
+
+document.addEventListener('contextmenu',e=>{if(!submitted)e.preventDefault()});
+document.addEventListener('keydown',e=>{if(!submitted&&(e.ctrlKey||e.metaKey)&&['c','v','x','a','p','s'].includes(e.key.toLowerCase()))e.preventDefault()});
+document.addEventListener('copy',e=>{if(!submitted)e.preventDefault()});
+document.addEventListener('paste',e=>{if(!submitted)e.preventDefault()});
+
+/* ═══ HIGHLIGHT — Bulletproof, single-line only ═══ */
+(function(){
+const hlBtn=$('highlight-btn'),rmBtn=$('remove-highlight-btn'),pp=$('passage-pane'),qp=$('q-pane');
+let lastRange=null,hlTarget=null,mDown=false,mMoved=false;
+document.addEventListener('mousedown',e=>{mDown=true;mMoved=false;if(e.target!==hlBtn&&e.target!==rmBtn)hide()});
+document.addEventListener('mousemove',()=>{if(mDown)mMoved=true});
+document.addEventListener('mouseup',()=>{mDown=false});
+function blk(n){let e=n.nodeType===3?n.parentNode:n;while(e&&e!==pp&&e!==qp&&e!==document.body){try{const d=getComputedStyle(e).display;if(['block','flex','table-cell','list-item','table-row','table','grid'].includes(d))return e}catch(x){return null}e=e.parentNode}return null}
+function valid(){const s=window.getSelection();if(!s||!s.rangeCount||s.isCollapsed)return null;if(!s.toString().trim())return null;const r=s.getRangeAt(0),a=r.commonAncestorContainer;if(!pp.contains(a)&&!qp.contains(a))return null;for(const nd of[r.startContainer,r.endContainer]){let n=nd.nodeType===3?nd.parentNode:nd;if(n&&n.closest&&n.closest('input,select,textarea,.drop-zone,.drag-chip'))return null}const b1=blk(r.startContainer),b2=blk(r.endContainer);if(!b1||!b2||b1!==b2)return null;return r}
+function pos(btn,rect){const pane=pp.contains(window.getSelection().anchorNode)?pp:qp;const pr=pane.getBoundingClientRect();let top=rect.top-40,left=rect.left;if(top<pr.top)top=rect.bottom+6;btn.style.top=top+'px';btn.style.left=left+'px';btn.style.display='block'}
+function hide(){hlBtn.style.display='none';rmBtn.style.display='none';hlTarget=null}
+hlBtn.addEventListener('click',e=>{e.stopPropagation();if(!lastRange)return;try{const sp=document.createElement('span');sp.className='highlighted';sp.appendChild(lastRange.extractContents());lastRange.insertNode(sp);sp.parentNode&&sp.parentNode.normalize()}catch(x){}window.getSelection().removeAllRanges();lastRange=null;hide()});
+rmBtn.addEventListener('click',e=>{e.stopPropagation();if(!hlTarget)return;const p=hlTarget.parentNode;while(hlTarget.firstChild)p.insertBefore(hlTarget.firstChild,hlTarget);p.removeChild(hlTarget);p.normalize();hide()});
+let sf=null;
+document.addEventListener('selectionchange',()=>{if(sf)cancelAnimationFrame(sf);sf=requestAnimationFrame(()=>{hide();const r=valid();if(r){lastRange=r.cloneRange();pos(hlBtn,r.getBoundingClientRect())}else lastRange=null;sf=null})});
+document.addEventListener('click',e=>{const m=e.target.closest('.highlighted');if(m&&!mMoved){e.preventDefault();e.stopPropagation();hlTarget=m;pos(rmBtn,m.getBoundingClientRect())}});
+window._wasDrag=()=>mMoved;
+})();
+
+/* ═══ ANSWER TRACKING ═══ */
+function markCard(q,v){answers[q]=v||null;const c=document.getElementById('qc'+q);if(c)c.classList.toggle('answered',!!v)}
+document.addEventListener('click',e=>{const b=e.target.closest('.tfng-btn');if(!b)return;const g=b.closest('.tfng-group'),q=parseInt(g.dataset.q);g.querySelectorAll('.tfng-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');markCard(q,b.dataset.val)});
+document.addEventListener('click',e=>{const o=e.target.closest('.mc-option[data-type="single"]');if(!o)return;if(window._wasDrag&&window._wasDrag()){const s=window.getSelection();if(s&&!s.isCollapsed&&s.toString().trim())return}const g=o.closest('.mc-options-group'),q=parseInt(g.dataset.q);g.querySelectorAll('.mc-option').forEach(x=>x.classList.remove('selected'));o.classList.add('selected');markCard(q,o.dataset.val)});
+document.addEventListener('click',e=>{const o=e.target.closest('.mc-option[data-type="multi"]');if(!o)return;if(window._wasDrag&&window._wasDrag()){const s=window.getSelection();if(s&&!s.isCollapsed&&s.toString().trim())return}const g=o.closest('.mc-options-group'),mx=parseInt(g.dataset.max)||2,qs=g.dataset.q.split(',').map(Number),sel=g.querySelectorAll('.mc-option.selected');if(!o.classList.contains('selected')&&sel.length>=mx)return;o.classList.toggle('selected');const vals=Array.from(g.querySelectorAll('.mc-option.selected')).map(x=>x.dataset.val);qs.forEach((q,i)=>markCard(q,vals[i]||null))});
+document.addEventListener('change',e=>{const s=e.target.closest('.heading-select,.ending-select,.match-select');if(!s)return;markCard(parseInt(s.dataset.q),s.value||null)});
+document.addEventListener('input',e=>{const i=e.target.closest('.fill-input,.inline-input,.table-input');if(!i)return;markCard(parseInt(i.dataset.q),i.value.trim()||null)});
+
+/* ═══ DRAG AND DROP ═══ */
+(function(){let dc=null;
+document.addEventListener('dragstart',e=>{const c=e.target.closest('.drag-chip');if(!c||c.classList.contains('used')){e.preventDefault();return}dc=c;c.style.opacity='.5';e.dataTransfer.setData('text/plain',c.dataset.val);e.dataTransfer.effectAllowed='move'});
+document.addEventListener('dragend',()=>{if(dc){dc.style.opacity='';dc=null}});
+document.addEventListener('dragover',e=>{if(e.target.closest('.drop-zone')){e.preventDefault();e.target.closest('.drop-zone').classList.add('drag-over')}});
+document.addEventListener('dragleave',e=>{const z=e.target.closest('.drop-zone');if(z)z.classList.remove('drag-over')});
+document.addEventListener('drop',e=>{e.preventDefault();const z=e.target.closest('.drop-zone');if(!z||!dc)return;z.classList.remove('drag-over');if(z.dataset.currentVal){const pool=z.closest('.q-sec,.q-pane');if(pool){const prev=pool.querySelector(`.drag-chip[data-val="${z.dataset.currentVal}"]`);if(prev)prev.classList.remove('used')}}const v=dc.dataset.val;z.textContent=dc.dataset.label||v;z.classList.add('filled');z.dataset.currentVal=v;dc.classList.add('used');const q=parseInt(z.dataset.q);if(q)markCard(q,v)});
+document.addEventListener('click',e=>{const z=e.target.closest('.drop-zone.filled');if(!z)return;const v=z.dataset.currentVal,pool=z.closest('.q-sec,.q-pane');if(pool&&v){const ch=pool.querySelector(`.drag-chip[data-val="${v}"]`);if(ch)ch.classList.remove('used')}z.textContent=z.dataset.placeholder||'—';z.classList.remove('filled');z.dataset.currentVal='';const q=parseInt(z.dataset.q);if(q)markCard(q,null)});
+})();
+
+/* ═══ SUBMIT ═══ */
+$('submit-btn').addEventListener('click',()=>{$('modal-viol').textContent='Tab switches: '+violations;$('submit-modal').classList.add('show')});
+$('modal-cancel').addEventListener('click',()=>$('submit-modal').classList.remove('show'));
+$('modal-yes').addEventListener('click',()=>{$('submit-modal').classList.remove('show');doSubmit()});
+function doSubmit(){submitted=true;stopTimer();finalDate=new Date().toISOString().slice(0,10);if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});setTimeout(()=>{dlHTML();setTimeout(()=>{genPDF();showResult()},650)},250)}
+
+function showResult(){$('practice-screen').style.display='none';$('result-screen').style.display='block';$('r-name').textContent=studentName;$('r-date').textContent=finalDate;$('r-time').textContent=fmtTime(secs);$('r-viol').textContent='Tab switches: '+violations;$('r-viol-wrap').style.color=violations>0?'var(--orange)':'var(--gray-400)';const list=$('ans-list');list.innerHTML='';getRows().forEach(r=>{list.innerHTML+=`<div class="ans-row"><div class="ans-q">Q${r.q}</div><div class="${r.a?'ans-v':'ans-v none'}">${r.a||'(no answer)'}</div></div>`});$('success-msg').style.display='block'}
+
+$('copy-btn').addEventListener('click',()=>{let t=`EDUNEST – Reading\n${PASS_TITLE}\nStudent: ${studentName}\nDate: ${finalDate}\nTime: ${fmtTime(secs)}\nViolations: ${violations}\n\n`;getRows().forEach(r=>{t+=`Q${r.q}: ${r.a||'(no answer)'}\n`});navigator.clipboard.writeText(t).then(()=>{const b=$('copy-btn');b.textContent='✓ Copied!';setTimeout(()=>b.textContent='📋 Copy Answers',2000)})});
+
+function dlHTML(){const rows=getRows();const tr=rows.map(r=>`<tr><td style="font-family:monospace;color:#e63946;font-weight:700;padding:8px 16px;border-bottom:1px solid #f3f4f6">Q${r.q}</td><td style="font-family:monospace;padding:8px 16px;border-bottom:1px solid #f3f4f6;color:${r.a?'#1f2937':'#9ca3af'};font-style:${r.a?'normal':'italic'}">${r.a||'(no answer)'}</td></tr>`).join('');const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>EDUNEST Answer Sheet</title></head><body style="font-family:sans-serif;background:#f9fafb;padding:40px 20px;margin:0"><div style="max-width:640px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)"><div style="background:#e63946;padding:24px 32px"><div style="font-size:22px;font-weight:700;color:#fff">EDUNEST</div><div style="font-size:12px;color:rgba(255,255,255,.8);letter-spacing:2px;text-transform:uppercase;margin-top:4px">Reading — Answer Sheet</div></div><div style="padding:24px 32px"><table style="font-size:14px;margin-bottom:20px"><tr><td style="padding:4px 20px 4px 0;color:#4b5563">👤</td><td><strong>${studentName}</strong></td></tr><tr><td style="padding:4px 20px 4px 0;color:#4b5563">📖</td><td>${PASS_TITLE} (P${PASS_NUM})</td></tr><tr><td style="padding:4px 20px 4px 0;color:#4b5563">📅</td><td>${finalDate}</td></tr><tr><td style="padding:4px 20px 4px 0;color:#4b5563">⏱</td><td>${fmtTime(secs)}</td></tr><tr><td style="padding:4px 20px 4px 0;color:#4b5563">⚠</td><td style="color:${violations>0?'#f59e0b':'#9ca3af'}">${violations}</td></tr></table><div style="border:2px solid #e5e7eb;border-radius:8px;overflow:hidden"><div style="background:#f3f4f6;padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#6b7280">Questions ${Q_RANGE}</div><table style="width:100%;border-collapse:collapse">${tr}</table></div></div></div></body></html>`;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([html],{type:'text/html'}));a.download=`EDUNEST_Reading_${sanitize(studentName)}_${finalDate}.html`;a.click()}
+
+$('pdf-btn').addEventListener('click',genPDF);
+function genPDF(){const{jsPDF}=window.jspdf;if(!jsPDF)return;const doc=new jsPDF({unit:'pt',format:'a4'});const pw=doc.internal.pageSize.getWidth(),ph=doc.internal.pageSize.getHeight();doc.setFillColor(230,57,70);doc.rect(0,0,pw,80,'F');doc.setFont('helvetica','bold');doc.setFontSize(22);doc.setTextColor(255,255,255);doc.text('EDUNEST',36,36);doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(255,220,220);doc.text('Reading — Answer Sheet',36,56);let y=104;[['Student:',studentName],['Passage:',PASS_TITLE+' (P'+PASS_NUM+')'],['Date:',finalDate],['Time:',fmtTime(secs)],['Violations:',String(violations)]].forEach(([l,v])=>{doc.setFont('helvetica','bold');doc.setTextColor(31,41,55);doc.setFontSize(11);doc.text(l,36,y);doc.setFont('helvetica','normal');doc.setTextColor(75,85,99);doc.text(v,200,y);y+=19});y+=6;doc.setDrawColor(229,231,235);doc.setLineWidth(1);doc.line(36,y,pw-36,y);y+=16;doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(31,41,55);doc.text('Questions '+Q_RANGE,36,y);y+=14;getRows().forEach((r,i)=>{if(y>ph-60){doc.addPage();y=40}if(i%2===0){doc.setFillColor(249,250,251);doc.rect(36,y-11,pw-72,19,'F')}doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(230,57,70);doc.text('Q'+r.q,46,y);doc.setFont('helvetica','normal');const c=r.a?[31,41,55]:[156,163,175];doc.setTextColor(c[0],c[1],c[2]);doc.text(r.a||'(no answer)',110,y);y+=19});const total=doc.internal.getNumberOfPages();for(let p=1;p<=total;p++){doc.setPage(p);doc.setFontSize(9);doc.setTextColor(156,163,175);doc.text('Generated by EDUNEST',pw/2,ph-28,{align:'center'})}doc.save(`IELTS_Reading_${sanitize(studentName)}_${finalDate}.pdf`)}
+</script>
+</body>
+</html>
